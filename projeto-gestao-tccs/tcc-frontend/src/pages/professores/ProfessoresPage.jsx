@@ -1,24 +1,31 @@
 import { useEffect, useState } from 'react'
 import DataTable from '../../components/DataTable'
 import Modal from '../../components/Modal'
-import { getCursos, createCurso, updateCurso, deleteCurso } from '../../services/api'
+import { getProfessores, createProfessor, updateProfessor, deleteProfessor, getDepartamentos } from '../../services/api'
 
-const empty = { nome: '', sigla: '', codigo: '' }
+const empty = { nome: '', departamento: '' }
 
-export default function CursosPage() {
+export default function ProfessoresPage() {
   const [data, setData] = useState([])
+  const [departamentos, setDepartamentos] = useState([])
   const [modal, setModal] = useState(false)
   const [confirmId, setConfirmId] = useState(null)
   const [form, setForm] = useState(empty)
   const [editId, setEditId] = useState(null)
   const [error, setError] = useState(null)
 
-  const load = () => getCursos().then(r => setData(r.data))
+  const load = async () => {
+    const [profs, deps] = await Promise.all([getProfessores(), getDepartamentos()])
+    setData(profs.data)
+    setDepartamentos(deps.data)
+  }
   useEffect(() => { load() }, [])
+
+  const depNome = (id) => departamentos.find(d => d.id === id)?.nome ?? '—'
 
   const openAdd = () => { setForm(empty); setEditId(null); setError(null); setModal(true) }
   const openEdit = (row) => {
-    setForm({ nome: row.nome, sigla: row.sigla, codigo: row.codigo })
+    setForm({ nome: row.nome, departamento: row.departamento })
     setEditId(row.id)
     setError(null)
     setModal(true)
@@ -26,8 +33,8 @@ export default function CursosPage() {
 
   const save = async () => {
     try {
-      if (editId) await updateCurso(editId, form)
-      else await createCurso(form)
+      if (editId) await updateProfessor(editId, form)
+      else await createProfessor(form)
       setModal(false)
       load()
     } catch (err) {
@@ -40,7 +47,7 @@ export default function CursosPage() {
   }
 
   const remove = async () => {
-    await deleteCurso(confirmId)
+    await deleteProfessor(confirmId)
     setConfirmId(null)
     load()
   }
@@ -48,13 +55,12 @@ export default function CursosPage() {
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'nome', label: 'Nome' },
-    { key: 'sigla', label: 'Sigla' },
-    { key: 'codigo', label: 'Código' },
+    { key: 'departamento', label: 'Departamento', render: (v) => depNome(v) },
   ]
 
   return (
     <div>
-      <h1 style={{ marginBottom: 20, fontSize: 22, fontWeight: 700 }}>Cursos</h1>
+      <h1 style={{ marginBottom: 20, fontSize: 22, fontWeight: 700 }}>Professores</h1>
       <DataTable
         title="Listagem"
         columns={columns}
@@ -66,7 +72,7 @@ export default function CursosPage() {
       />
 
       {modal && (
-        <Modal title={editId ? 'Editar Curso' : 'Novo Curso'} onClose={() => setModal(false)} onSave={save}>
+        <Modal title={editId ? 'Editar Professor' : 'Novo Professor'} onClose={() => setModal(false)} onSave={save}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {error && (
               <div style={{ background: '#FEE2E2', color: '#B91C1C', padding: '10px 14px', borderRadius: 8, fontSize: 13, whiteSpace: 'pre-line' }}>
@@ -75,15 +81,14 @@ export default function CursosPage() {
             )}
             <div>
               <label>Nome</label>
-              <input value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} placeholder="Ex: Ciência da Computação" />
+              <input value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} placeholder="Nome completo do professor" />
             </div>
             <div>
-              <label>Sigla</label>
-              <input value={form.sigla} onChange={e => setForm(f => ({ ...f, sigla: e.target.value }))} placeholder="Ex: CC" />
-            </div>
-            <div>
-              <label>Código</label>
-              <input value={form.codigo} onChange={e => setForm(f => ({ ...f, codigo: e.target.value }))} placeholder="Ex: CC001" />
+              <label>Departamento</label>
+              <select value={form.departamento} onChange={e => setForm(f => ({ ...f, departamento: e.target.value }))}>
+                <option value="">Selecione...</option>
+                {departamentos.map(d => <option key={d.id} value={d.id}>{d.nome} ({d.sigla})</option>)}
+              </select>
             </div>
           </div>
         </Modal>
@@ -91,7 +96,7 @@ export default function CursosPage() {
 
       {confirmId && (
         <Modal title="Confirmar exclusão" onClose={() => setConfirmId(null)} onSave={remove}>
-          <p style={{ color: 'var(--muted)' }}>Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.</p>
+          <p style={{ color: 'var(--muted)' }}>Tem certeza que deseja excluir este professor? Esta ação não pode ser desfeita.</p>
         </Modal>
       )}
     </div>
