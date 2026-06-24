@@ -143,7 +143,7 @@ function DetailPanel({ tcc, alunos, professores, onClose, onEdit, onDelete }) {
           <Detail icon={<Tag size={16}/>}        label="2º Membro"         value={profNome(tcc.segundo_membro)}/>
           {tcc.arquivo && (
             <div style={{ marginTop:16 }}>
-              <a href={`http://localhost:8000${tcc.arquivo}`} target="_blank" rel="noreferrer" style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'9px 16px',background:G.bg,color:G.main,border:`1px solid ${G.light}`,borderRadius:8,fontSize:14,fontWeight:600,textDecoration:'none' }}>
+              <a href={tcc.arquivo.startsWith('http') ? tcc.arquivo : `http://localhost:8000${tcc.arquivo}`} target="_blank" rel="noreferrer" style={{ display:'inline-flex',alignItems:'center',gap:8,padding:'9px 16px',background:G.bg,color:G.main,border:`1px solid ${G.light}`,borderRadius:8,fontSize:14,fontWeight:600,textDecoration:'none' }}>
                 <Upload size={16}/> Ver Arquivo PDF
               </a>
             </div>
@@ -186,7 +186,7 @@ export default function TCCsPage() {
 
   const openAdd = () => { setForm(empty);setEditId(null);setError(null);setTab(0);setModal(true) }
   const openEdit = row => {
-    setForm({ titulo:row.titulo,resumo:row.resumo,palavras_chave:row.palavras_chave,tipo:row.tipo,idioma:row.idioma,status:row.status,aluno:row.aluno,orientador:row.orientador,coorientador:row.coorientador??'',presidente:row.presidente,primeiro_membro:row.primeiro_membro,segundo_membro:row.segundo_membro,semestre_letivo_defesa:row.semestre_letivo_defesa??'',arquivo:null })
+    setForm({ titulo:row.titulo,resumo:row.resumo,palavras_chave:row.palavras_chave,tipo:row.tipo,idioma:row.idioma,status: String(row.status),aluno:row.aluno,orientador:row.orientador,coorientador:row.coorientador??'',presidente:row.presidente,primeiro_membro:row.primeiro_membro,segundo_membro:row.segundo_membro,semestre_letivo_defesa:row.semestre_letivo_defesa??'',arquivo:null })
     setEditId(row.id);setError(null);setTab(0);setModal(true)
   }
 

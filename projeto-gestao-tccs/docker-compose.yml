@@ -1,13 +1,38 @@
 services:
+  db:
+    image: postgres:16
+    container_name: tcc_db
+    environment:
+      POSTGRES_DB: tcc_db
+      POSTGRES_USER: tcc_user
+      POSTGRES_PASSWORD: tcc_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tcc_user -d tcc_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: .
     container_name: tcc_backend
     ports:
       - "8000:8000"
+    environment:
+      POSTGRES_DB: tcc_db
+      POSTGRES_USER: tcc_user
+      POSTGRES_PASSWORD: tcc_password
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
     volumes:
       - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
- 
+
   frontend:
     build: ./tcc-frontend
     container_name: tcc_frontend
@@ -21,4 +46,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
- 
+
+volumes:
+  postgres_data:
