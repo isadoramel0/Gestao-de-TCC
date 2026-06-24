@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: .
+    container_name: tcc_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+ 
+  frontend:
+    build: ./tcc-frontend
+    container_name: tcc_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://backend:8000
+    volumes:
+      - ./tcc-frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+ 
