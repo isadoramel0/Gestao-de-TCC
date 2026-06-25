@@ -1,6 +1,6 @@
 # Sistema de Gestão de TCCs
 
-Sistema web para gerenciamento de Trabalhos de Conclusão de Curso, desenvolvido como trabalho prático da disciplina **GAC116 – Programação Web (2026/1) – UFLA**.
+Sistema web para gerenciamento de Trabalhos de Conclusão de Curso, desenvolvido como trabalho prático da disciplina **GAC116 - Programação Web (2026/1) - UFLA**.
 
 ---
 
@@ -199,4 +199,4 @@ O script `load.py` popula o banco com:
 
 ## Equipe
 
-Trabalho desenvolvido em grupo para a disciplina GAC116 – Programação Web, UFLA, 2026/1.
+Trabalho desenvolvido em grupo para a disciplina GAC116 - Programação Web, UFLA, 2026/1.
